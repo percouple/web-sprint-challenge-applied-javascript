@@ -1,3 +1,5 @@
+import axios from 'axios'
+
 const Card = (article) => {
   // TASK 5
   // ---------------------
@@ -17,6 +19,35 @@ const Card = (article) => {
   //   </div>
   // </div>
   //
+
+  // Doc Creations
+  const cardDiv = document.createElement("div");
+  const headlineDiv = document.createElement("div");
+  const authorDiv = document.createElement("div");
+  const imgContainerDiv = document.createElement("div");
+  const imageDiv = document.createElement("img");
+  const span = document.createElement("span")
+
+  // Classlist changes/Other additions
+  cardDiv.classList.add("card");
+  headlineDiv.classList.add("headline");
+  headlineDiv.textContent = article.headline;
+  authorDiv.classList.add("author");
+  imgContainerDiv.classList.add("img-container");
+  imageDiv.setAttribute("src", article.authorPhoto);
+  span.textContent = "By " + article.authorName;
+
+  // Appendings
+  cardDiv.appendChild(headlineDiv);
+  cardDiv.appendChild(authorDiv);
+  authorDiv.appendChild(imgContainerDiv);
+  imgContainerDiv.appendChild(imageDiv);
+  authorDiv.appendChild(span);
+
+  cardDiv.addEventListener("click", (event) => {
+    console.log(article.headline)
+  })
+  return cardDiv
 }
 
 const cardAppender = (selector) => {
@@ -28,6 +59,32 @@ const cardAppender = (selector) => {
   // Create a card from each and every article object in the response, using the Card component.
   // Append each card to the element in the DOM that matches the selector passed to the function.
   //
+
+  axios.get(`http://localhost:5001/api/articles`)
+    .then((response) => {
+      const getSelector = document.querySelector(selector);
+      const articles = Object.entries(response.data.articles);
+
+      // Loop for articles array
+      articles.forEach((articleGroupWithTitle) => {
+        let articleGroup = articleGroupWithTitle[1];
+        console.log(articleGroupWithTitle);
+
+        // Loop for each topic array
+        for (let i = 0; i < articleGroup.length; i++) {
+          console.log(articleGroup[i]);
+
+          // articleGroup[i].forEach((element) => {
+            getSelector.appendChild(Card(articleGroup[i]))
+          // })
+        }
+      })
+      return getSelector
+    })
+    .catch(err => {
+      console.log(err)
+      console.log("Whoops - a - Daisy");
+    })
 }
 
 export { Card, cardAppender }
